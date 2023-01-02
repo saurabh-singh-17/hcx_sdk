@@ -19,11 +19,18 @@ public class HCXFHIRResourceCreateExample {
 
     public static void main(String args[]) throws Exception {
 
-        //Initializing the FHIR parser
+        /**
+         * Initializing FHIR HAPI parser for R4 version as Swasth IGs follow R4 HL7 FHIR standards
+         * Parser context is later used to covert FHIR objects in JSON and other formats for easy readability and data transfer
+        */
         IParser p = FhirContext.forR4().newJsonParser().setPrettyPrint(true);
 
+        /**
+         * Initializing hcx_sdk to use helper functions and FHIR validator
+         * Documentation is available at https://github.com/Swasth-Digital-Health-Foundation/hcx-platform/releases/tag/hcx-integrator-sdk-1.0.0
+         */
+
         Map<String, Object> configMap = new HashMap<>();
-        //configMap.put("protocolBasePath","a851b026063934683964f22c6732f177-1969328968.ap-south-1.elb.amazonaws.com");
         configMap.put("protocolBasePath", "http://staging-hcx.swasth.app/api/v0.7");
         configMap.put("participantCode", "1-ab535902-cc4d-4300-9e15-56c12cd939c0");
         configMap.put("authBasePath", "http://a9dd63de91ee94d59847a1225da8b111-273954130.ap-south-1.elb.amazonaws.com:8080/auth/realms/swasth-health-claim-exchange/protocol/openid-connect/token");
@@ -34,84 +41,102 @@ public class HCXFHIRResourceCreateExample {
         HCXIntegrator.init(configMap);
 
 
-
-        //Information needed to create coverage eligibility bundle with mandatory fields
+        /**
+         * We will now try to create a Coverage Eligibility Request Bundle as per
+         * https://www.hl7.org/fhir/bundle.html
+         * While creating a bundle resource we need provide a mandatory BundleType. We will be using
+         * BundleTYpe as Document as per the resource link shared above.
+         */
         Map<String, Object> inputMap = new HashMap<>();
-        inputMap.put("COMP_Status",Composition.CompositionStatus.FINAL);
+
         inputMap.put("BUNDLE_Type",Bundle.BundleType.DOCUMENT);
 
 
+        /**
+         * HCX FHIR implementation requires BundleType to be "Document" and in such cases a Composition resource is mandatory in
+         * the bundle. We will create a Composition resource for our CoverageEligibilityRequest below
+         * Composition resource structure definition is available at "https://ig.hcxprotocol.io/v0.7/StructureDefinition-CoverageEligibilityRequestDocument.html"
+         * While creating a Composition resource we need provide a Status. We will be using Status as final
+         * Users can use other values for Status as per the business scenarios which is available in the bundle definition
+         */
+        inputMap.put("COMP_Status",Composition.CompositionStatus.FINAL);
         Composition comp = new Composition();
+
+        /**
+         * Meta is not a mandatory field as per the definitions but we need to include HCX profile links in resource field in meta
+         * to ensure that the resource is validated against given HCX FHIR profile. In below case, as we are creating a coverage eligibility
+         * composition as per https://ig.hcxprotocol.io/v0.7/StructureDefinition-CoverageEligibilityRequestDocument.html so we need to give the
+         * same link the Meta information
+         */
         Meta metaComp = new Meta();
         metaComp.getProfile().add(new CanonicalType("https://ig.hcxprotocol.io/v0.7/StructureDefinition-CoverageEligibilityRequestDocument.html"));
         //comp.setMeta(metaComp);
+        /**
+         * We will now be providing other mandatory fields as oer the HCX FHIR standards.
+         * We are using sample values in most places. Please replace the values as per your needs.
+         */
         comp.setId("COMPCOVELEREQ");
         comp.setStatus((Composition.CompositionStatus) inputMap.get("COMP_Status"));
         comp.setTitle("Coverage Eligibility Request");
+        /**
+         * Identifiers are mandatory in almost all resource definitions.
+         * Identifier has two main components, a System and a Code. We need to provide a System which is a URL that
+         * contains the organization or participants identifier code such as Rohini ID etc.
+         */
         comp.setIdentifier(new Identifier().setSystem("https://www.tmh.in/hcx-documents").setValue(UUID.randomUUID().toString()));
         comp.setType(new CodeableConcept(new Coding().setSystem("https://www.hcx.org/document-type").setCode("HcxCoverageEligibilityRequest").setDisplay("Coverage Eligibility Request Doc")));
         comp.setSubject(new Reference("Patient/RVH1003"));
         comp.setDate(new Date());
         comp.getAuthor().add(new Reference("Organization/Tmh01"));
+        /**
+         * We need to add a reference to the CoverageEligibilityRequest object in the Section
+         */
         comp.getSection().add(new Composition.SectionComponent().setTitle("# Eligibility Request").setCode(new CodeableConcept(new Coding().setSystem("https://fhir.loinc.org/CodeSystem/$lookup?system=http://loinc.org&code=10154-3").setCode( "CoverageEligibilityRequest").setDisplay("Coverage Eligibility Request"))).addEntry(new Reference("CoverageEligibilityRequest/dc82673b-8c71-48c2-8a17-16dcb3b035f6")));
-        //comp.setType(new CodeableConcept(new Coding().setSystem("http://loinc.org").setCode("11485-0")));
-        //System.out.println("Composition " + p.encodeResourceToString(comp));
 
-        //Getting the resource examples
+        /**
+         * CoverageEligibilityRequest Bundle must contain a CoverageEligibilityRequest resource
+         * Users can import and explore a CoverageEligibilityRequest example already created and code is available
+         * in file "HCXCoverageEligibility.java"
+         * We will also be importing other reference profiles used in CoverageEligibilityRequest example already created
+         */
         CoverageEligibilityRequest ce = HCXCoverageEligibility.CoverageEligibilityRequestExample();
         Organization hos = HCXOrganization.ProviderExample();
         Organization org = HCXOrganization.InsurerExample();
         Patient pat = HCXPatient.PatientExample();
         Coverage cov = HCXCoverage.HCXCoverageExample();
 
-        //Making the Coverage Eligibility Bundle
-        Bundle ble = new Bundle();
-        ble.setId(UUID.randomUUID().toString());
-        ble.setMeta(new Meta().setLastUpdated(new Date()));
-        ble.setIdentifier(new Identifier().setSystem( "https://www.tmh.in/bundle").setValue(UUID.randomUUID().toString()));
-        ble.setType((Bundle.BundleType) inputMap.get("BUNDLE_Type"));
-        ble.setTimestamp(new Date());
-        ble.getEntry().add(new Bundle.BundleEntryComponent().setFullUrl("Composition/42ff4a07-3e36-402f-a99e-29f16c0c9eee").setResource(comp));
-        ble.getEntry().add(new Bundle.BundleEntryComponent().setFullUrl("CoverageEligibilityRequest/dc82673b-8c71-48c2-8a17-16dcb3b035f6").setResource(ce));
-        ble.getEntry().add(new Bundle.BundleEntryComponent().setFullUrl("Organization/Tmh01").setResource(hos));
-        ble.getEntry().add(new Bundle.BundleEntryComponent().setFullUrl("Patient/RVH1003").setResource(pat));
-        ble.getEntry().add(new Bundle.BundleEntryComponent().setFullUrl("Organization/GICOFINDIA").setResource(org));
-        ble.getEntry().add(new Bundle.BundleEntryComponent().setFullUrl("Coverage/COVERAGE1").setResource(cov));
-        System.out.println("BundleCER " + p.encodeResourceToString(ble));
+        /**
+         * Now, we need to add the referenced resources in CoverageEligibilityRequest resource such as Patient, Organizations, Coverage
+         * into the CoverageEligibilityRequest object. We can achieve it by using "contained" field in the CoverageEligibilityRequest
+         * structure definition. We add need to add the Composition object we crated earlier. We should ensure that
+         * composition object is the fist element in "contained" array
+         */
+        ce.addContained(comp);
+        ce.addContained(hos);
+        ce.addContained(org);
+        ce.addContained(pat);
+        ce.addContained(cov);
 
+        /**
+         * We can now convert the CoverageEligibilityRequest object into a CoverageEligibilityRequest bundle using the
+         * resourceToBundle
+         */
+        Bundle bundleTest = HCXFHIRUtils.resourceToBundle(ce, Bundle.BundleType.DOCUMENT);
+        System.out.println("reosurceToBundle \n" + p.encodeResourceToString(bundleTest));
 
-
-
-        //Testing bundleToResource
-        DomainResource covRes = HCXFHIRUtils.bundleToResource(ble);
+        /**
+         * CoverageEligibilityRequest bundle can be converted into a CoverageEligibilityRequest object using the
+         * bundleToResource
+         */
+        DomainResource covRes = HCXFHIRUtils.bundleToResource(bundleTest);
         System.out.println("bundleToResource \n" + p.encodeResourceToString(covRes));
 
 
-        //Testing resourceToBundle
-        Bundle bundleTest = HCXFHIRUtils.resourceToBundle(covRes, Bundle.BundleType.DOCUMENT);
-        System.out.println("reosurceToBundle \n" + p.encodeResourceToString(bundleTest));
-
-
-        //Making the v0.7.1 coverageeligibilitybundle
-        //Making the Coverage Eligibility Bundle
-        Bundle bleNew = new Bundle();
-        bleNew.setId(UUID.randomUUID().toString());
-        Meta metaCENew = new Meta();
-        metaCENew.getProfile().add(new CanonicalType("https://ig.hcxprotocol.io/v0.7.1/StructureDefinition-CoverageEligibilityRequestBundle.html"));
-        comp.setMeta(metaCENew);
-        bleNew.setIdentifier(new Identifier().setSystem( "https://www.tmh.in/bundle").setValue(UUID.randomUUID().toString()));
-        bleNew.setType(Bundle.BundleType.COLLECTION);
-        bleNew.setTimestamp(new Date());
-        bleNew.getEntry().add(new Bundle.BundleEntryComponent().setFullUrl("CoverageEligibilityRequest/dc82673b-8c71-48c2-8a17-16dcb3b035f6").setResource(ce));
-        bleNew.getEntry().add(new Bundle.BundleEntryComponent().setFullUrl("Organization/Tmh01").setResource(hos));
-        bleNew.getEntry().add(new Bundle.BundleEntryComponent().setFullUrl("Patient/RVH1003").setResource(pat));
-        bleNew.getEntry().add(new Bundle.BundleEntryComponent().setFullUrl("Organization/GICOFINDIA").setResource(org));
-        bleNew.getEntry().add(new Bundle.BundleEntryComponent().setFullUrl("Coverage/COVERAGE1").setResource(cov));
-        System.out.println("BundleCER " + p.encodeResourceToString(bleNew));
-
-        //validate the created payload
+        /**
+         * All the resources in the bundle can be validated using the HCX FHIR validator available in the HCX SDK
+         */
         FhirValidator validator = HCXFHIRValidator.getValidator();
-        ValidationResult result1 = validator.validateWithResult(bleNew);
+        ValidationResult result1 = validator.validateWithResult(bundleTest);
         for (SingleValidationMessage next : result1.getMessages()) {
             System.out.println(next.getSeverity() + " -- " + next.getLocationString() + " -- " + next.getMessage());
         }
