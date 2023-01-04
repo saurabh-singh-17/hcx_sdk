@@ -129,7 +129,7 @@ public class HCXFHIRResourceCreateExample {
          * bundleToResource
          */
         DomainResource covRes = HCXFHIRUtils.bundleToResource(bundleTest);
-        System.out.println("bundleToResource \n" + p.encodeResourceToString(covRes));
+        //System.out.println("bundleToResource \n" + p.encodeResourceToString(covRes));
 
 
         /**

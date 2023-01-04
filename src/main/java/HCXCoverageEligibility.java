@@ -6,13 +6,6 @@ public class HCXCoverageEligibility {
 
     public static CoverageEligibilityRequest CoverageEligibilityRequestExample() {
 
-        //Defining the input map for creating the example
-        Map<String, Object> inputMap = new HashMap<>();
-        inputMap.put("CE_Status", CoverageEligibilityRequest.EligibilityRequestStatus.ACTIVE);
-        inputMap.put("CE_priority","normal");
-        inputMap.put("CE_purpose",CoverageEligibilityRequest.EligibilityRequestPurpose.BENEFITS);
-
-
         //Creating coverage eligibility request
         CoverageEligibilityRequest ce = new CoverageEligibilityRequest();
         ce.setId("dc82673b-8c71-48c2-8a17-16dcb3b035f6");
@@ -20,11 +13,11 @@ public class HCXCoverageEligibility {
         meta.getProfile().add(new CanonicalType("https://ig.hcxprotocol.io/v0.7/StructureDefinition-CoverageEligibilityRequest.html"));
         ce.setMeta(meta);
         ce.getIdentifier().add(new Identifier().setValue("req_70e02576-f5f5-424f-b115-b5f1029704d4"));
-        ce.setStatus((CoverageEligibilityRequest.EligibilityRequestStatus) inputMap.get("CE_Status"));
-        ce.setPriority(new CodeableConcept(new Coding().setSystem("http://terminology.hl7.org/CodeSystem/processpriority").setCode((String) inputMap.get("CE_priority"))));
+        ce.setStatus(CoverageEligibilityRequest.EligibilityRequestStatus.ACTIVE);
+        ce.setPriority(new CodeableConcept(new Coding().setSystem("http://terminology.hl7.org/CodeSystem/processpriority").setCode("normal")));
 
         EnumFactory<CoverageEligibilityRequest.EligibilityRequestPurpose> fact = new CoverageEligibilityRequest.EligibilityRequestPurposeEnumFactory();
-        ce.setPurpose(List.of((Enumeration) new Enumeration<>(fact).setValue((CoverageEligibilityRequest.EligibilityRequestPurpose) inputMap.get("CE_purpose"))));
+        ce.setPurpose(List.of((Enumeration) new Enumeration<>(fact).setValue(CoverageEligibilityRequest.EligibilityRequestPurpose.BENEFITS)));
 
         ce.setPatient(new Reference("Patient/RVH1003"));
         ce.getServicedPeriod().setStart(new Date(System.currentTimeMillis())).setEnd(new Date(System.currentTimeMillis()));
