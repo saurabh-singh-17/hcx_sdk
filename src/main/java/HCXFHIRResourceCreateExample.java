@@ -117,6 +117,7 @@ public class HCXFHIRResourceCreateExample {
         ce.addContained(pat);
         ce.addContained(cov);
 
+        
         /**
          * We can now convert the CoverageEligibilityRequest object into a CoverageEligibilityRequest bundle using the
          * resourceToBundle
