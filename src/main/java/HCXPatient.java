@@ -5,7 +5,7 @@ import java.util.Map;
 
 public class HCXPatient {
 
-    public static Patient PatientExample(){
+    public static Patient patientExample(){
 
         //making a Patient resource
         Patient pat = new Patient();

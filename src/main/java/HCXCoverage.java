@@ -5,7 +5,7 @@ import java.util.Map;
 
 public class HCXCoverage {
 
-    public static Coverage HCXCoverageExample(){
+    public static Coverage coverageExample(){
         //making the coverage resource
         Coverage cov = new Coverage();
         cov.setId("COVERAGE1");

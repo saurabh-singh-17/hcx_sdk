@@ -42,4 +42,10 @@ public class HCXFHIRUtils {
         }
         return dm;
     }
+
+    public static void addContainedToResource(DomainResource mainResource, DomainResource[] args){
+        for(DomainResource item:args){
+            mainResource.addContained(item);
+        }
+    }
 }

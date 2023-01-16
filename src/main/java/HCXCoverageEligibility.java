@@ -4,7 +4,7 @@ import org.hl7.fhir.r4.model.Enumeration;
 import java.util.*;
 public class HCXCoverageEligibility {
 
-    public static CoverageEligibilityRequest CoverageEligibilityRequestExample() {
+    public static CoverageEligibilityRequest coverageEligibilityRequestExample() {
 
         //Creating coverage eligibility request
         CoverageEligibilityRequest ce = new CoverageEligibilityRequest();
@@ -30,7 +30,7 @@ public class HCXCoverageEligibility {
         return ce;
     }
 
-    public static CoverageEligibilityResponse CoverageEligibilityResponseExample() {
+    public static CoverageEligibilityResponse coverageEligibilityResponseExample() {
         //Creating the coverage eligibility response
         CoverageEligibilityResponse covelires = new CoverageEligibilityResponse();
         Meta metaResponse = new Meta();
