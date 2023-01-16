@@ -3,7 +3,7 @@ import java.util.Date;
 
 public class HCXClaim {
 
-    public static Claim ClaimExample(){
+    public static Claim claimExample(){
         //Creating the Claims request
         Claim claim = new Claim();
         Meta metaClaim = new Meta();
@@ -26,7 +26,7 @@ public class HCXClaim {
         return claim;
     }
 
-    public static ClaimResponse ClaimResponseExample(){
+    public static ClaimResponse claimResponseExample(){
         //Creating Claim response
         ClaimResponse claimRes = new ClaimResponse();
         Meta metaClaimRes = new Meta();

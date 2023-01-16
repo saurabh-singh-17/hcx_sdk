@@ -17,7 +17,7 @@ import java.util.*;
 
 public class HCXFHIRResourceCreateExample {
 
-    public static void main(String args[]) throws Exception {
+    public static void main(String[] args) throws Exception {
 
         /**
          * Initializing FHIR HAPI parser for R4 version as Swasth IGs follow R4 HL7 FHIR standards
@@ -45,12 +45,8 @@ public class HCXFHIRResourceCreateExample {
          * We will now try to create a Coverage Eligibility Request Bundle as per
          * https://www.hl7.org/fhir/bundle.html
          * While creating a bundle resource we need provide a mandatory BundleType. We will be using
-         * BundleTYpe as Document as per the resource link shared above.
+         * BundleTYpe as Document as per the resource link shared above. We will be using Bundle.BundleType.DOCUMENT
          */
-        Map<String, Object> inputMap = new HashMap<>();
-
-        inputMap.put("BUNDLE_Type",Bundle.BundleType.DOCUMENT);
-
 
         /**
          * HCX FHIR implementation requires BundleType to be "Document" and in such cases a Composition resource is mandatory in
@@ -58,12 +54,12 @@ public class HCXFHIRResourceCreateExample {
          * Composition resource structure definition is available at "https://ig.hcxprotocol.io/v0.7/StructureDefinition-CoverageEligibilityRequestDocument.html"
          * While creating a Composition resource we need provide a Status. We will be using Status as final
          * Users can use other values for Status as per the business scenarios which is available in the bundle definition
+         * We will create a Composition below for CoverageEligibilityRequest
          */
-        inputMap.put("COMP_Status",Composition.CompositionStatus.FINAL);
         Composition comp = new Composition();
 
         /**
-         * Meta is not a mandatory field as per the definitions but we need to include HCX profile links in resource field in meta
+         * Meta is not a mandatory field as per the definitions, but we need to include HCX profile links in resource field in meta
          * to ensure that the resource is validated against given HCX FHIR profile. In below case, as we are creating a coverage eligibility
          * composition as per https://ig.hcxprotocol.io/v0.7/StructureDefinition-CoverageEligibilityRequestDocument.html so we need to give the
          * same link the Meta information
@@ -76,7 +72,7 @@ public class HCXFHIRResourceCreateExample {
          * We are using sample values in most places. Please replace the values as per your needs.
          */
         comp.setId("COMPCOVELEREQ");
-        comp.setStatus((Composition.CompositionStatus) inputMap.get("COMP_Status"));
+        comp.setStatus(Composition.CompositionStatus.FINAL);
         comp.setTitle("Coverage Eligibility Request");
         /**
          * Identifiers are mandatory in almost all resource definitions.
@@ -99,11 +95,11 @@ public class HCXFHIRResourceCreateExample {
          * in file "HCXCoverageEligibility.java"
          * We will also be importing other reference profiles used in CoverageEligibilityRequest example already created
          */
-        CoverageEligibilityRequest ce = HCXCoverageEligibility.CoverageEligibilityRequestExample();
-        Organization hos = HCXOrganization.ProviderExample();
-        Organization org = HCXOrganization.InsurerExample();
-        Patient pat = HCXPatient.PatientExample();
-        Coverage cov = HCXCoverage.HCXCoverageExample();
+        CoverageEligibilityRequest ce = HCXCoverageEligibility.coverageEligibilityRequestExample();
+        Organization hos = HCXOrganization.providerOrganizationExample();
+        Organization org = HCXOrganization.insurerOrganizationExample();
+        Patient pat = HCXPatient.patientExample();
+        Coverage cov = HCXCoverage.coverageExample();
 
         /**
          * Now, we need to add the referenced resources in CoverageEligibilityRequest resource such as Patient, Organizations, Coverage
@@ -111,19 +107,16 @@ public class HCXFHIRResourceCreateExample {
          * structure definition. We add need to add the Composition object we crated earlier. We should ensure that
          * composition object is the fist element in "contained" array
          */
-        ce.addContained(comp);
-        ce.addContained(hos);
-        ce.addContained(org);
-        ce.addContained(pat);
-        ce.addContained(cov);
 
-        
+        HCXFHIRUtils.addContainedToResource(ce,new DomainResource[]{comp,hos,org,pat,cov});
+        System.out.println("main res with contained \n" + p.encodeResourceToString(ce));
+
         /**
          * We can now convert the CoverageEligibilityRequest object into a CoverageEligibilityRequest bundle using the
          * resourceToBundle
          */
         Bundle bundleTest = HCXFHIRUtils.resourceToBundle(ce, Bundle.BundleType.DOCUMENT);
-        System.out.println("reosurceToBundle \n" + p.encodeResourceToString(bundleTest));
+        //System.out.println("reosurceToBundle \n" + p.encodeResourceToString(bundleTest));
 
         /**
          * CoverageEligibilityRequest bundle can be converted into a CoverageEligibilityRequest object using the

@@ -5,7 +5,7 @@ import java.util.Map;
 
 public class HCXOrganization {
 
-    public static Organization ProviderExample(){
+    public static Organization providerOrganizationExample(){
         //making the hospital org resource
         Organization hos = new Organization();
         hos.setId("Tmh01");
@@ -17,7 +17,7 @@ public class HCXOrganization {
         return hos;
     }
 
-    public static Organization InsurerExample(){
+    public static Organization insurerOrganizationExample(){
         //making an organization resource
         Organization org = new Organization();
         Meta metaorg = new Meta();
