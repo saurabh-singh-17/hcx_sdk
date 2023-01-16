@@ -109,7 +109,7 @@ public class HCXFHIRResourceCreateExample {
          */
 
         /**
-         * We can use the addContainedToResource fuction from Utils to add the referenced resources in the main resource
+         * We can use the addContainedToResource function from Utils to add the referenced resources in the main resource
          * We have to pass Primary resource as the first argument and then all the referenced resources as an array of DomainResource
          */
         HCXFHIRUtils.addContainedToResource(ce,new DomainResource[]{comp,hos,org,pat,cov});
