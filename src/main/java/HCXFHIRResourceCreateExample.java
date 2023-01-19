@@ -34,18 +34,70 @@ public class HCXFHIRResourceCreateExample {
          */
         String publicKeyUrl = "https://raw.githubusercontent.com/Swasth-Digital-Health-Foundation/hcx-platform/sprint-29/demo-app/server/resources/keys/x509-private-key.pem";
         String certificate = IOUtils.toString(new URL(publicKeyUrl), StandardCharsets.UTF_8.toString());
-        System.out.println("certificate " + certificate);
 
         Map<String, Object> configMap = new HashMap<>();
         configMap.put("protocolBasePath", "http://staging-hcx.swasth.app/api/v0.7");
-        configMap.put("participantCode", "1-ab535902-cc4d-4300-9e15-56c12cd939c0");
+        configMap.put("participantCode", "1-521eaec7-8cb9-4b6c-8b4e-4dba300af6f4");
         configMap.put("authBasePath", "http://a9dd63de91ee94d59847a1225da8b111-273954130.ap-south-1.elb.amazonaws.com:8080/auth/realms/swasth-health-claim-exchange/protocol/openid-connect/token");
-        configMap.put("username", "sanjit.vimal@narayanahealth.org");
+        configMap.put("username", "swasth_mock_provider@swasthapp.org");
         configMap.put("password", "Opensaber@123");
         configMap.put("encryptionPrivateKey", certificate);
         configMap.put("igUrl", "https://ig.hcxprotocol.io/v0.7");
         HCXIntegrator.init(configMap);
 
+        /**
+         * Swasth IG version : 0.7.1
+         */
+
+        /**
+         * We will now try to create a Coverage Eligibility Request Bundle as per
+         * Resource Profile: HCX CoverageEligibility Request Bundle
+         * Defining URL:	https://ig.hcxprotocol.io/v0.7.1/StructureDefinition-CoverageEligibilityRequestBundle.html
+         * Version:	0.7.1
+         * Name:	CovereageEligibilityRequestBundle
+         * Title:	Covereage Eligibility Request Bundle
+         * Definition:
+         * Coverage Eligibility Request constraints on Bundle resource ensuring that a coverage eligibility request resource is present.
+         * While creating a bundle resource we need provide a mandatory BundleType. We will be using
+         * BundleTYpe as Document as per the resource link shared above. We will be using Bundle.BundleType.COLLECTION
+         */
+
+        /**
+         * CoverageEligibilityRequest Bundle must contain a CoverageEligibilityRequest resource
+         * Users can import and explore a CoverageEligibilityRequest example already created and code is available
+         * in file "HCXCoverageEligibility.java"
+         * We will also be importing other reference profiles used in CoverageEligibilityRequest example already created
+         */
+        CoverageEligibilityRequest ce = HCXCoverageEligibility.coverageEligibilityRequestExample();
+        Organization hos = HCXOrganization.providerOrganizationExample();
+        Organization org = HCXOrganization.insurerOrganizationExample();
+        Patient pat = HCXPatient.patientExample();
+        Coverage cov = HCXCoverage.coverageExample();
+
+        /**
+         * Now, we need to add the referenced resources in CoverageEligibilityRequest resource such as Patient, Organizations, Coverage
+         * into the CoverageEligibilityRequest object. We can achieve it by using "contained" field in the CoverageEligibilityRequest
+         * structure definition.
+         */
+
+        /**
+         * We can use the addContainedToResource function from Utils to add the referenced resources in the main resource
+         * We have to pass Primary resource as the first argument and then all the referenced resources as an array of DomainResource
+         */
+        HCXFHIRUtils.addContainedToResource(ce,new DomainResource[]{hos,org,pat,cov});
+        //System.out.println("main res with contained \n" + p.encodeResourceToString(ce));
+
+        /**
+         * We can now convert the CoverageEligibilityRequest object into a CoverageEligibilityRequest bundle using the
+         * resourceToBundle
+         */
+        Bundle bundleTest = HCXFHIRUtils.resourceToBundle(ce, Bundle.BundleType.COLLECTION, "https://ig.hcxprotocol.io/v0.7.1/StructureDefinition-CoverageEligibilityRequestBundle.html");
+        System.out.println("reosurceToBundle \n" + p.encodeResourceToString(bundleTest));
+
+
+        /**
+         * Swasth IG version : 0.7
+         */
 
         /**
          * We will now try to create a Coverage Eligibility Request Bundle as per
@@ -63,6 +115,14 @@ public class HCXFHIRResourceCreateExample {
          * We will create a Composition below for CoverageEligibilityRequest
          */
         Composition comp = new Composition();
+
+        /**
+         * We add need to add the Composition object we crated earlier. We should ensure that
+         * composition object is the fist element in "contained" array
+         */
+
+        //HCXFHIRUtils.addContainedToResource(ce,new DomainResource[]{comp,hos,org,pat,cov});
+        //System.out.println("main res with contained \n" + p.encodeResourceToString(ce));
 
         /**
          * Meta is not a mandatory field as per the definitions, but we need to include HCX profile links in resource field in meta
@@ -95,38 +155,6 @@ public class HCXFHIRResourceCreateExample {
          */
         comp.getSection().add(new Composition.SectionComponent().setTitle("# Eligibility Request").setCode(new CodeableConcept(new Coding().setSystem("https://fhir.loinc.org/CodeSystem/$lookup?system=http://loinc.org&code=10154-3").setCode( "CoverageEligibilityRequest").setDisplay("Coverage Eligibility Request"))).addEntry(new Reference("CoverageEligibilityRequest/dc82673b-8c71-48c2-8a17-16dcb3b035f6")));
 
-        /**
-         * CoverageEligibilityRequest Bundle must contain a CoverageEligibilityRequest resource
-         * Users can import and explore a CoverageEligibilityRequest example already created and code is available
-         * in file "HCXCoverageEligibility.java"
-         * We will also be importing other reference profiles used in CoverageEligibilityRequest example already created
-         */
-        CoverageEligibilityRequest ce = HCXCoverageEligibility.coverageEligibilityRequestExample();
-        Organization hos = HCXOrganization.providerOrganizationExample();
-        Organization org = HCXOrganization.insurerOrganizationExample();
-        Patient pat = HCXPatient.patientExample();
-        Coverage cov = HCXCoverage.coverageExample();
-
-        /**
-         * Now, we need to add the referenced resources in CoverageEligibilityRequest resource such as Patient, Organizations, Coverage
-         * into the CoverageEligibilityRequest object. We can achieve it by using "contained" field in the CoverageEligibilityRequest
-         * structure definition. We add need to add the Composition object we crated earlier. We should ensure that
-         * composition object is the fist element in "contained" array
-         */
-
-        /**
-         * We can use the addContainedToResource function from Utils to add the referenced resources in the main resource
-         * We have to pass Primary resource as the first argument and then all the referenced resources as an array of DomainResource
-         */
-        HCXFHIRUtils.addContainedToResource(ce,new DomainResource[]{comp,hos,org,pat,cov});
-        System.out.println("main res with contained \n" + p.encodeResourceToString(ce));
-
-        /**
-         * We can now convert the CoverageEligibilityRequest object into a CoverageEligibilityRequest bundle using the
-         * resourceToBundle
-         */
-        Bundle bundleTest = HCXFHIRUtils.resourceToBundle(ce, Bundle.BundleType.DOCUMENT);
-        //System.out.println("reosurceToBundle \n" + p.encodeResourceToString(bundleTest));
 
         /**
          * CoverageEligibilityRequest bundle can be converted into a CoverageEligibilityRequest object using the

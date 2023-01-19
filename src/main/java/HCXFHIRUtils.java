@@ -11,11 +11,14 @@ public class HCXFHIRUtils {
     //Initializing the FHIR parser
     static IParser p = FhirContext.forR4().newJsonParser().setPrettyPrint(true);
 
-    public static Bundle resourceToBundle(DomainResource res, Bundle.BundleType type){
+    public static Bundle resourceToBundle(DomainResource res, Bundle.BundleType type, String bundleURL){
         DomainResource resource = res.copy();
         Bundle bundle = new Bundle();
         bundle.setId(UUID.randomUUID().toString());
-        bundle.setMeta(new Meta().setLastUpdated(new Date()));
+        Meta meta = new Meta();
+        meta.getProfile().add(new CanonicalType(bundleURL));
+        meta.setLastUpdated(new Date());
+        bundle.setMeta(meta);
         bundle.setIdentifier(new Identifier().setSystem( "https://www.tmh.in/bundle").setValue(UUID.randomUUID().toString()));
         bundle.setType((type));
         bundle.setTimestamp(new Date());
