@@ -38,9 +38,9 @@ public class HCXFHIRResourceCreateExample {
 
         Map<String, Object> configMap = new HashMap<>();
         configMap.put("protocolBasePath", "http://staging-hcx.swasth.app/api/v0.7");
-        configMap.put("participantCode", "1-ab535902-cc4d-4300-9e15-56c12cd939c0");
+        configMap.put("participantCode", "1-521eaec7-8cb9-4b6c-8b4e-4dba300af6f4");
         configMap.put("authBasePath", "http://a9dd63de91ee94d59847a1225da8b111-273954130.ap-south-1.elb.amazonaws.com:8080/auth/realms/swasth-health-claim-exchange/protocol/openid-connect/token");
-        configMap.put("username", "sanjit.vimal@narayanahealth.org");
+        configMap.put("username", "swasth_mock_provider@swasthapp.org");
         configMap.put("password", "Opensaber@123");
         configMap.put("encryptionPrivateKey", certificate);
         configMap.put("igUrl", "https://ig.hcxprotocol.io/v0.7");
