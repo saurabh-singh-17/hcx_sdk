@@ -36,9 +36,8 @@ public class HCXFHIRUtils {
 
     public static DomainResource bundleToResource(Bundle resource){
         Bundle newBundle = resource.copy();
-        Bundle.BundleEntryComponent par = newBundle.getEntry().get(1);
+        Bundle.BundleEntryComponent par = newBundle.getEntry().get(0);
         DomainResource dm = (DomainResource) par.getResource();
-        dm.addContained(newBundle.getEntry().get(0).getResource());
         for(int i=1; i<newBundle.getEntry().size(); i++){
             dm.addContained(newBundle.getEntry().get(i).getResource());
         }
