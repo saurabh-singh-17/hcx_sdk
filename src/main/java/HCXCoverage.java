@@ -10,7 +10,7 @@ public class HCXCoverage {
         Coverage cov = new Coverage();
         cov.setId("COVERAGE1");
         Meta metacov = new Meta();
-        metacov.getProfile().add(new CanonicalType("https://ig.hcxprotocol.io/v0.7/StructureDefinition-Coverage.html"));
+        metacov.getProfile().add(new CanonicalType("https://ig.hcxprotocol.io/v0.7.1/StructureDefinition-Coverage.html"));
         cov.setMeta(metacov);
         cov.setStatus(Coverage.CoverageStatus.ACTIVE);
         cov.getIdentifier().add(new Identifier().setValue("policy-RVH1003").setSystem("https://www.gicofIndia.in/policies"));

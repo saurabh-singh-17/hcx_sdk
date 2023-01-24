@@ -11,7 +11,7 @@ public class HCXFHIRUtils {
     //Initializing the FHIR parser
     static IParser p = FhirContext.forR4().newJsonParser().setPrettyPrint(true);
 
-    public static Bundle resourceToBundle(DomainResource res, Bundle.BundleType type, String bundleURL){
+    public static Bundle resourceToBundle(DomainResource res, DomainResource[] referencedResource, Bundle.BundleType type, String bundleURL){
         DomainResource resource = res.copy();
         Bundle bundle = new Bundle();
         bundle.setId(UUID.randomUUID().toString());
@@ -22,15 +22,14 @@ public class HCXFHIRUtils {
         bundle.setIdentifier(new Identifier().setSystem( "https://www.tmh.in/bundle").setValue(UUID.randomUUID().toString()));
         bundle.setType((type));
         bundle.setTimestamp(new Date());
-        List<Resource> refResources = resource.getContained();
-        for (Resource refResource : refResources) {
+        //adding the main resource to the bundle entry
+        resource.getContained().clear();
+        bundle.getEntry().add(new Bundle.BundleEntryComponent().setFullUrl(resource.getResourceType() + "/" + resource.getId().toString().replace("#","")).setResource(resource));
+        for (Resource refResource : referencedResource) {
             String id = refResource.getId().toString().replace("#","");
             refResource.setId(id);
             bundle.getEntry().add(new Bundle.BundleEntryComponent().setFullUrl(refResource.getResourceType() + "/" + id).setResource(refResource));
         }
-        //adding the main resource to the bundle entry
-        resource.getContained().clear();
-        bundle.getEntry().add(new Bundle.BundleEntryComponent().setFullUrl(resource.getResourceType() + "/" + resource.getId().toString().replace("#","")).setResource(resource));
         return bundle;
     }
 
@@ -40,15 +39,9 @@ public class HCXFHIRUtils {
         Bundle.BundleEntryComponent par = newBundle.getEntry().get(1);
         DomainResource dm = (DomainResource) par.getResource();
         dm.addContained(newBundle.getEntry().get(0).getResource());
-        for(int i=2; i<newBundle.getEntry().size(); i++){
+        for(int i=1; i<newBundle.getEntry().size(); i++){
             dm.addContained(newBundle.getEntry().get(i).getResource());
         }
         return dm;
-    }
-
-    public static void addContainedToResource(DomainResource mainResource, DomainResource[] args){
-        for(DomainResource item:args){
-            mainResource.addContained(item);
-        }
     }
 }

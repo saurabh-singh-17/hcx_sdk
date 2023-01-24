@@ -7,7 +7,7 @@ public class HCXClaim {
         //Creating the Claims request
         Claim claim = new Claim();
         Meta metaClaim = new Meta();
-        metaClaim.getProfile().add(new CanonicalType("https://ig.hcxprotocol.io/v0.7/StructureDefinition-Claim.html"));
+        metaClaim.getProfile().add(new CanonicalType("https://ig.hcxprotocol.io/v0.7.1/StructureDefinition-Claim.html"));
         metaClaim.setLastUpdated(new Date());
         claim.setMeta(metaClaim);
         claim.setStatus(org.hl7.fhir.r4.model.Claim.ClaimStatus.ACTIVE);
@@ -30,7 +30,7 @@ public class HCXClaim {
         //Creating Claim response
         ClaimResponse claimRes = new ClaimResponse();
         Meta metaClaimRes = new Meta();
-        metaClaimRes.getProfile().add(new CanonicalType("https://ig.hcxprotocol.io/v0.7/StructureDefinition-ClaimResponse.html"));
+        metaClaimRes.getProfile().add(new CanonicalType("https://ig.hcxprotocol.io/v0.7.1/StructureDefinition-ClaimResponse.html"));
         metaClaimRes.setLastUpdated(new Date());
         claimRes.setMeta(metaClaimRes);
         claimRes.setStatus(ClaimResponse.ClaimResponseStatus.ACTIVE);
