@@ -42,7 +42,7 @@ public class HCXFHIRResourceCreateExample {
         configMap.put("username", "swasth_mock_provider@swasthapp.org");
         configMap.put("password", "Opensaber@123");
         configMap.put("encryptionPrivateKey", certificate);
-        configMap.put("igUrl", "https://ig.hcxprotocol.io/v0.7");
+        configMap.put("igUrl", "https://ig.hcxprotocol.io/v0.7.1");
         HCXIntegrator.init(configMap);
 
         /**
@@ -84,16 +84,32 @@ public class HCXFHIRResourceCreateExample {
          * To create the bundle we can use resourceToBundle function.In the below example, we are using "ce", a coverage eligibility resource
          * as the main object and an array of other resources which we need in the bundle
          */
-        Bundle bundleTest = HCXFHIRUtils.resourceToBundle(ce, new DomainResource[]{hos,org,pat,cov}, Bundle.BundleType.COLLECTION, "https://ig.hcxprotocol.io/v0.7.1/StructureDefinition-CoverageEligibilityRequestBundle.html");
-        System.out.println("reosurceToBundle \n" + p.encodeResourceToString(bundleTest));
+        List<DomainResource> domList = List.of(hos,org,pat,cov);
+        Bundle bundleTest = new Bundle();
+        try{
+            bundleTest = HCXFHIRUtils.resourceToBundle(ce, domList, Bundle.BundleType.COLLECTION, "https://ig.hcxprotocol.io/v0.7.1/StructureDefinition-CoverageEligibilityRequestBundle.html");
+            System.out.println("reosurceToBundle \n" + p.encodeResourceToString(bundleTest));
+        }catch (Exception e){
+            System.out.println("Error message " + e.getMessage());
+        }
+
+
 
 
         /**
          * CoverageEligibilityRequest bundle can be converted into a CoverageEligibilityRequest object using the
          * bundleToResource
          */
-        DomainResource covRes = HCXFHIRUtils.bundleToResource(bundleTest);
-        //System.out.println("bundleToResource \n" + p.encodeResourceToString(covRes));
+        DomainResource covRes = HCXFHIRUtils.getPrimaryResource(bundleTest, "https://ig.hcxprotocol.io/v0.7.1/StructureDefinition-CoverageEligibilityRequest.html");
+        System.out.println("getPrimaryResource \n" + p.encodeResourceToString(covRes));
+
+
+        /**
+         * CoverageEligibilityRequest bundle can be converted into a CoverageEligibilityRequest object using the
+         * bundleToResource
+ */
+        List<DomainResource> covRef = HCXFHIRUtils.getReferencedResource(bundleTest);
+        System.out.println("getReferencedResource \n" + covRef);
 
 
         /**
@@ -110,15 +126,13 @@ public class HCXFHIRResourceCreateExample {
         HCXOutgoingRequest outgoing;
         //Creating empty map to store output
         Map<String,Object> outmap = new HashMap<>();
-        {
-            try {
-                outgoing = new HCXOutgoingRequest();
-                outgoing.generate(p.encodeResourceToString(bundleTest), Operations.COVERAGE_ELIGIBILITY_CHECK, "1-29482df3-e875-45ef-a4e9-592b6f565782",outmap);
-                System.out.println("generated payload "+ outmap);
-            } catch (Exception e) {
-                System.out.println("Error in generating outgoing payload");
-                throw new RuntimeException(e);
-            }
+        try {
+            outgoing = new HCXOutgoingRequest();
+            outgoing.generate(p.encodeResourceToString(bundleTest), Operations.COVERAGE_ELIGIBILITY_CHECK, "1-29482df3-e875-45ef-a4e9-592b6f565782",outmap);
+            System.out.println("generated payload "+ outmap);
+        } catch (Exception e) {
+            System.out.println("Error in generating outgoing payload");
+            throw new RuntimeException(e);
         }
 
 
@@ -126,19 +140,16 @@ public class HCXFHIRResourceCreateExample {
 
         //Processing an incoming request
         HCXIncomingRequest hcxIncomingRequest;
-
-        {
-            try {
-                hcxIncomingRequest = new HCXIncomingRequest();
-                Map<String, Object> output = new HashMap<>();
-                Map<String, Object> abcd = new HashMap<>();
-                abcd.put("payload",outmap.get("payload"));
-                hcxIncomingRequest.process(JSONUtils.serialize(abcd), Operations.COVERAGE_ELIGIBILITY_CHECK, output);
-                System.out.println("output of incoming request " + output);
-            } catch (Exception e) {
-                System.out.println("Error with processing incoming payload");
-                throw new RuntimeException(e);
-            }
+        try {
+            hcxIncomingRequest = new HCXIncomingRequest();
+            Map<String, Object> output = new HashMap<>();
+            Map<String, Object> abcd = new HashMap<>();
+            abcd.put("payload",outmap.get("payload"));
+            hcxIncomingRequest.process(JSONUtils.serialize(abcd), Operations.COVERAGE_ELIGIBILITY_CHECK, output);
+            System.out.println("output of incoming request " + output);
+        } catch (Exception e) {
+            System.out.println("Error with processing incoming payload");
+            throw new RuntimeException(e);
         }
 
 
