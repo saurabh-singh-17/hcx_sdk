@@ -97,16 +97,18 @@ public class HCXFHIRResourceCreateExample {
 
 
         /**
-         * CoverageEligibilityRequest bundle can be converted into a CoverageEligibilityRequest object using the
-         * bundleToResource
+         * CoverageEligibilityRequest bundle can be used to extract the main resource which is CoverageEligibilityRequest
+         * in this example using the function getPrimaryResource. In case no URL is provided for the SD, first entry in the bundle will be
+         * returned
          */
         DomainResource covRes = HCXFHIRUtils.getPrimaryResource(bundleTest, "https://ig.hcxprotocol.io/v0.7.1/StructureDefinition-CoverageEligibilityRequest.html");
         System.out.println("getPrimaryResource \n" + p.encodeResourceToString(covRes));
 
 
         /**
-         * CoverageEligibilityRequest bundle can be converted into a CoverageEligibilityRequest object using the
-         * bundleToResource
+         * CoverageEligibilityRequest bundle can be used to get all the referenced resources in the main resource from the bundle
+         * if present using getReferencedResource. If a URL is passed then, the URL is treated as the main resource and all other
+         * resources in the bundle is returned. If no URL is passed then all resources apart from the first entry is returned
  */
         List<DomainResource> covRef = HCXFHIRUtils.getReferencedResource(bundleTest);
         System.out.println("getReferencedResource \n" + covRef);

@@ -80,12 +80,37 @@ CoverageEligibilityRequest Bundle must contain a CoverageEligibilityRequest reso
         Coverage cov = HCXCoverage.coverageExample();
 
 
-We can now convert the CoverageEligibilityRequest object into a CoverageEligibilityRequest bundle using the resourceToBundle
 
-        Bundle bundleTest = HCXFHIRUtils.resourceToBundle(ce, new DomainResource[]{hos,org,pat,cov}, Bundle.BundleType.COLLECTION, "https://ig.hcxprotocol.io/v0.7.1/StructureDefinition-CoverageEligibilityRequestBundle.html");
-        System.out.println("reosurceToBundle \n" + p.encodeResourceToString(bundleTest));
+Now, we need to add the referenced resources in CoverageEligibilityRequest resource such as Patient, Organizations, Coverage
+into the CoverageEligibilityRequest object.
 
-CoverageEligibilityRequest bundle can be converted into a CoverageEligibilityRequest object using the bundleToResource. All referenced resource will be in the "contained" field
+We can now create bundle as per the https://ig.hcxprotocol.io/v0.7.1/StructureDefinition-CoverageEligibilityRequestBundle.html
+To create the bundle we can use resourceToBundle function.In the below example, we are using "ce", a coverage eligibility resource
+as the main object and an array of other resources which we need in the bundle
 
-        DomainResource covRes = HCXFHIRUtils.bundleToResource(bundleTest);
-        System.out.println("bundleToResource \n" + p.encodeResourceToString(covRes));
+        List<DomainResource> domList = List.of(hos,org,pat,cov);
+        Bundle bundleTest = new Bundle();
+        try{
+            bundleTest = HCXFHIRUtils.resourceToBundle(ce, domList, Bundle.BundleType.COLLECTION, "https://ig.hcxprotocol.io/v0.7.1/StructureDefinition-CoverageEligibilityRequestBundle.html");
+            System.out.println("reosurceToBundle \n" + p.encodeResourceToString(bundleTest));
+        }catch (Exception e){
+            System.out.println("Error message " + e.getMessage());
+        }
+
+
+
+
+CoverageEligibilityRequest bundle can be used to extract the main resource which is CoverageEligibilityRequest
+in this example using the function getPrimaryResource. In case no URL is provided for the SD, first entry in the bundle will be
+returned
+
+        DomainResource covRes = HCXFHIRUtils.getPrimaryResource(bundleTest, "https://ig.hcxprotocol.io/v0.7.1/StructureDefinition-CoverageEligibilityRequest.html");
+        System.out.println("getPrimaryResource \n" + p.encodeResourceToString(covRes));
+
+
+CoverageEligibilityRequest bundle can be used to get all the referenced resources in the main resource from the bundle
+if present using getReferencedResource. If a URL is passed then, the URL is treated as the main resource and all other
+resources in the bundle is returned. If no URL is passed then all resources apart from the first entry is returned
+
+        List<DomainResource> covRef = HCXFHIRUtils.getReferencedResource(bundleTest);
+        System.out.println("getReferencedResource \n" + covRef);
