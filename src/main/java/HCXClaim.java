@@ -59,16 +59,17 @@ public class HCXClaim {
         metaClaimRes.setLastUpdated(new Date());
         claimRes.setMeta(metaClaimRes);
         claimRes.setStatus(ClaimResponse.ClaimResponseStatus.ACTIVE);
-        claimRes.addIdentifier(new Identifier().setSystem("http://identifiersystem.com").setValue("IdentifierValue"));
+        claimRes.addIdentifier(new Identifier().setSystem("http://identifiersystem.com").setValue(UUID.randomUUID().toString()));
         claimRes.setType(new CodeableConcept(new Coding().setSystem("http://terminology.hl7.org/CodeSystem/claim-type").setCode("institutional")));
         claimRes.setUse(ClaimResponse.Use.CLAIM);
         claimRes.setPatient(new Reference("Patient/RVH1003"));
         claimRes.setCreated(new Date());
         claimRes.setInsurer(new Reference("Organization/GICOFINDIA"));
-        claimRes.setRequestor(new Reference("Organization/Tmh01"));
+        claimRes.setRequestor(new Reference("Organization/WeMeanWell01"));
         claimRes.setRequest(new Reference("Claim/CLAIM1"));
-        claimRes.setOutcome(ClaimResponse.RemittanceOutcome.COMPLETE);
+        claimRes.setOutcome(ClaimResponse.RemittanceOutcome.ERROR);
         claimRes.getTotal().add(new ClaimResponse.TotalComponent().setCategory(new CodeableConcept(new Coding().setSystem("http://terminology.hl7.org/CodeSystem/adjudication").setCode("benefit"))).setAmount(new Money().setValue(80000).setCurrency("INR")));
+        claimRes.getError().add(new ClaimResponse.ErrorComponent(new CodeableConcept(new Coding().setSystem("http://hcxprotocol.io/codes/claim-error-codes").setCode("AUTH-005").setDisplay("\tClaim information is inconsistent with pre-certified/authorized services"))));
         return claimRes;
     }
 }

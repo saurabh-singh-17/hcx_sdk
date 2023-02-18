@@ -81,10 +81,11 @@ public class HCXCoverageEligibility {
         covelires.setCreated(new Date());
         covelires.setInsurer(new Reference("Organization/GICOFINDIA"));
         covelires.setRequest(new Reference("CoverageEligibilityRequest/dc82673b-8c71-48c2-8a17-16dcb3b035f6"));
-        covelires.setRequestor(new Reference("Organization/Tmh01"));
+        covelires.setRequestor(new Reference("Organization/WeMeanWell01"));
         covelires.setOutcome(Enumerations.RemittanceOutcome.COMPLETE);
         EnumFactory<CoverageEligibilityResponse.EligibilityResponsePurpose> fact = new CoverageEligibilityResponse.EligibilityResponsePurposeEnumFactory();
         covelires.setPurpose(List.of((Enumeration) new Enumeration<>(fact).setValue(CoverageEligibilityResponse.EligibilityResponsePurpose.BENEFITS)));
         return covelires;
     }
+
 }
