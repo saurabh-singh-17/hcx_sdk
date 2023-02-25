@@ -39,10 +39,10 @@
         "reference": "Practitioner/PractitionerViswasKar"
       },
       "provider": {
-        "reference": "Organization/GICOFINDIA"
+        "reference": "Organization/WeMeanWell01"
       },
       "insurer": {
-        "reference": "Organization/WeMeanWell01"
+        "reference": "Organization/GICOFINDIA"
       },
       "facility": {
         "reference": "http://sgh.com.sa/Location/4461281"
